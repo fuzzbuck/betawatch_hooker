@@ -5,9 +5,6 @@
 void SetupConsole() {
     if (!AllocConsole()) {
         // this might happen if GameClientApp.exe is launched with the --console flag, in which case we should try AttachConsole instead
-        MessageBox(nullptr, L"AllocConsole failed", nullptr, MB_ICONEXCLAMATION);
-    }
-    else {
         AttachConsole(GetCurrentProcessId());
     }
 
@@ -18,6 +15,7 @@ void SetupConsole() {
 }
 
 // courtesy of cere4l
+// triggers exception handlers to force decryption of a page
 void DecryptPage(__int64 page, __int64 gameBase) {
     DWORD_PTR vehHandler = gameBase + 0x13810d0;
     typedef void(__fastcall* dummyFn)(_EXCEPTION_POINTERS*);
@@ -42,13 +40,13 @@ DWORD WINAPI MainThread(LPVOID lpParam) {
 
     printf("gameBase: %llx\n", gameBase);
 
-    // base of ws2_32.dll
+    // base of winsocks module
     HMODULE ws2Module = GetModuleHandle(L"ws2_32.dll");
     __int64 ws2Base = (__int64)ws2Module;
     printf("ws2Base: %llx\n", ws2Base);
 
 
-    // get size of the module
+    // get size of the game module
     MODULEINFO modInfo;
     GetModuleInformation(GetCurrentProcess(), gameModule, &modInfo, sizeof(MODULEINFO));
     __int64 gameSize = modInfo.SizeOfImage;
