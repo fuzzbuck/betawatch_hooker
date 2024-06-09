@@ -5,11 +5,14 @@ recommended to auto inject the built DLL, but should work fine nonetheless
 
 
 [x] - done
+
 [ ] - planned
+
 [?] - maybe planned
 
+
 features:
- [x] - decrypt all pages ( decryptPage function courtesy of @cere4l )
- [ ] - hook ws2_32.send & ws2_32.recv
- [ ] - hook interesting JAM functions
- [?] - patch out initial JAM crypto exchange
+- [x] - decrypt all pages ( decryptPage function courtesy of @cere4l )
+- [ ] - hook ws2_32.send & ws2_32.recv
+- [ ] - hook interesting JAM functions
+- [?] - patch out initial JAM crypto exchange
