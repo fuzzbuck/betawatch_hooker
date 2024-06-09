@@ -1,0 +1,10 @@
+Debug
+Release
+x64
+.vs
+betawatch/*.aps
+betawatch/*.user
+betawatch/*.filters
+betawatch/Debug
+betawatch/Release
+betawatch/x64
