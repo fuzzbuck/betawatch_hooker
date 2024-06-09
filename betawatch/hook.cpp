@@ -4,7 +4,11 @@
 
 void SetupConsole() {
     if (!AllocConsole()) {
+        // this might happen if GameClientApp.exe is launched with the --console flag, in which case we should try AttachConsole instead
         MessageBox(nullptr, L"AllocConsole failed", nullptr, MB_ICONEXCLAMATION);
+    }
+    else {
+        AttachConsole(GetCurrentProcessId());
     }
 
     FILE* f;
@@ -13,10 +17,11 @@ void SetupConsole() {
     std::cout << "betawatch hooker loaded\n";
 }
 
+// courtesy of cere4l
 void DecryptPage(__int64 page, __int64 gameBase) {
     DWORD_PTR vehHandler = gameBase + 0x13810d0;
-    typedef void(__fastcall* testFn)(_EXCEPTION_POINTERS*);
-    auto testHandler = (testFn)vehHandler;
+    typedef void(__fastcall* dummyFn)(_EXCEPTION_POINTERS*);
+    auto dummyHandler = (dummyFn)vehHandler;
     //PVECTORED_EXCEPTION_HANDLER vehHandler = (PVECTORED_EXCEPTION_HANDLER)&;
     _EXCEPTION_POINTERS exc{};
     _EXCEPTION_RECORD record{};
@@ -24,9 +29,8 @@ void DecryptPage(__int64 page, __int64 gameBase) {
     exc.ExceptionRecord->ExceptionCode = 0xC0000005;
     exc.ExceptionRecord->ExceptionAddress = (PVOID)(gameBase + page);
     exc.ExceptionRecord->ExceptionInformation[1] = gameBase + page;
-    testHandler(&exc);
+    dummyHandler(&exc);
 }
-
 
 
 DWORD WINAPI MainThread(LPVOID lpParam) {
