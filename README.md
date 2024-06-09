@@ -4,11 +4,10 @@ This project was made to help understand how the overwatch 1 beta build works un
 recommended to auto inject the built DLL, but should work fine nonetheless
 
 
-[x] - done
-
-[ ] - planned
-
-[?] - maybe planned
+## legend
+- [x] - done
+- [ ] - planned
+- ? - maybe planned
 
 
 features:
