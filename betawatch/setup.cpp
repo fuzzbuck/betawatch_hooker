@@ -1,6 +1,8 @@
 #include "pch.h"
 #include <iostream>
 #include "psapi.h"
+#include "MinHook.h"
+#include "hooks.h"
 
 void SetupConsole() {
     if (!AllocConsole()) {
@@ -11,12 +13,13 @@ void SetupConsole() {
     FILE* f;
     freopen_s(&f, "CONOUT$", "w", stdout);
 
+
     std::cout << "betawatch hooker loaded\n";
 }
 
 // courtesy of cere4l
 // triggers exception handlers to force decryption of a page
-void DecryptPage(__int64 page, __int64 gameBase) {
+void decryptPage(__int64 page, __int64 gameBase) {
     DWORD_PTR vehHandler = gameBase + 0x13810d0;
     typedef void(__fastcall* dummyFn)(_EXCEPTION_POINTERS*);
     auto dummyHandler = (dummyFn)vehHandler;
@@ -34,16 +37,18 @@ void DecryptPage(__int64 page, __int64 gameBase) {
 DWORD WINAPI MainThread(LPVOID lpParam) {
     SetupConsole();
 
+    MH_STATUS status = MH_Initialize();
+    if (status != MH_OK) {
+        printf("failed to initialize minhook: %d\n", status);
+    }
+    printf("minhook initialized\n");
+
     // base adress of this module
     HMODULE gameModule = GetModuleHandle(NULL);
     __int64 gameBase = (__int64)gameModule;
 
     printf("gameBase: %llx\n", gameBase);
 
-    // base of winsocks module
-    HMODULE ws2Module = GetModuleHandle(L"ws2_32.dll");
-    __int64 ws2Base = (__int64)ws2Module;
-    printf("ws2Base: %llx\n", ws2Base);
 
 
     // get size of the game module
@@ -58,10 +63,13 @@ DWORD WINAPI MainThread(LPVOID lpParam) {
     /* call it from 0x1000 to game end (and increase by 0x100 every call) */
     int amt = 0;
     for (size_t i = 0x1000; i < gameSize; i += 0x100) {
-		DecryptPage(i, gameBase);
+		decryptPage(i, gameBase);
         amt += 1;
 	}
     printf("decrypted %d pages\n", amt);
+
+    // initialize hooks
+    InitHooks(gameBase);
 
 	return 0;
 }
